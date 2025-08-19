@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --secondary: #357abd;
+            --dark: #1a202c;
+            --light: #f7fafc;
+            --success: #48bb78;
+            --warning: #ecc94b;
+            --danger: #e53e3e;
+            --gray: #718096;
+            --gray-light: #e2e8f0;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--dark);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            padding: 20px 0;
+            transition: all 0.3s;
+            z-index: 100;
+            display: flex; /* Added */
+            flex-direction: column; /* Added */
+        }
+
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            padding: 0 15px;
+            overflow-y: auto; /* Added for scrolling */
+            flex-grow: 1; /* Take remaining space */
+            padding-bottom: 20px; /* Added bottom padding */
+        }
+
+        .nav-links::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .nav-links::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .nav-links::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .nav-links::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+
+        .nav-links li {
+            list-style: none;
+            margin-bottom: 5px;
+        }
+
+        .nav-links a {
+            color: #cbd5e0;
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(74, 144, 226, 0.2);
+            color: white;
+        }
+
+        .nav-links i {
+            margin-right: 12px;
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header-title p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 10px 15px 10px 40px;
+            border-radius: 50px;
+            border: 1px solid var(--gray-light);
+            width: 250px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        /* Profile Layout */
+        .profile-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .profile-sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+
+        .profile-card {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            border: 4px solid var(--gray-light);
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-title {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .profile-menu {
+            list-style: none;
+        }
+
+        .profile-menu li {
+            margin-bottom: 5px;
+        }
+
+        .profile-menu a {
+            display: block;
+            padding: 12px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--dark);
+            transition: all 0.2s;
+            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-menu a i {
+            margin-right: 10px;
+            width: 24px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .profile-menu a:hover, .profile-menu a.active {
+            background: rgba(74, 144, 226, 0.1);
+            color: var(--primary);
+        }
+
+        .profile-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .profile-header {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .profile-header h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-header p {
+            color: var(--gray);
+            font-size: 15px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--gray-light);
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            border: none;
+            font-size: 15px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--gray-light);
+            color: var(--gray);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-light);
+        }
+
+        /* Activity Feed */
+        .activity-feed {
+            margin-top: 30px;
+        }
+
+        .activity-item {
+            display: flex;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(74, 144, 226, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .activity-description {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--dark);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast i {
+            font-size: 20px;
+        }
+
+        .toast.success i {
+            color: var(--success);
+        }
+
+        .toast.error i {
+            color: var(--danger);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .logo h1 span, .nav-links a span {
+                display: none;
+            }
+            
+            .logo h1 {
+                justify-content: center;
+            }
+            
+            .nav-links a {
+                justify-content: center;
+                padding: 12px;
+            }
+            
+            .nav-links i {
+                margin-right: 0;
+                font-size: 20px;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+
+            .profile-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .search-box input {
+                width: 100%;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Action completed</span>
+    </div>
+
+    <!-- Sidebar -->
+     <nav id="navbar">
+    <div class="sidebar">
+        <div class="logo">
+            <h1><i class="fas fa-shield-alt"></i> <span>Admin Panel</span></h1>
+       </div>
+        <ul class="nav-links">
+            <li><a href="#"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+            <li><a href="add video.html"><i class="fas fa-video"></i> <span>Videos</span></a></li>
+            <li><a href="users.html"><i class="fas fa-users"></i> <span>Users</span></a></li>
+            <li><a href="new-users.html" ><i class="fas fa-user-plus"></i> <span>New Users</span></a></li>
+            <li><a href="analytics.html"><i class="fas fa-chart-line"></i> <span>Analytics</span></a></li>
+            <li><a href="redemptions.html"><i class="fas fa-gift"></i> <span>Redemptions</span></a></li>
+            <li><a href="tasks.html"><i class="fas fa-tasks"></i> <span>Tasks</span></a></li>
+            <li><a href="rewards.html"><i class="fas fa-coins"></i> <span>Rewards</span></a></li>
+            <li><a href="setting.html" class="active"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+            <li><a href="security.html"><i class="fas fa-lock"></i> <span>Security</span></a></li>
+            <li><a href="alerts.html"><i class="fas fa-exclamation-triangle"></i> <span>Alerts</span></a></li>
+            <li><a href="database.html"><i class="fas fa-database"></i> <span>Database</span></a></li>
+            <li><a href="integration.html"><i class="fas fa-plug"></i> <span>Integrations</span></a></li>
+            <!-- Added more items to demonstrate scrolling -->
+            <li><a href="#"><i class="fas fa-calendar"></i> <span>Calendar</span></a></li>
+            <li><a href="#"><i class="fas fa-file-alt"></i> <span>Documents</span></a></li>
+            <li><a href="#"><i class="fas fa-chart-pie"></i> <span>Reports</span></a></li>
+            <li><a href="#"><i class="fas fa-comments"></i> <span>Messages</span></a></li>
+            <li><a href="#"><i class="fas fa-bell"></i> <span>Notifications</span></a></li>
+            <li><a href="#"><i class="fas fa-book"></i> <span>Knowledge Base</span></a></li>
+            <li><a href="#"><i class="fas fa-life-ring"></i> <span>Support</span></a></li>
+        </ul>
+    </div>
+     </nav>
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">
+                <h1>My Profile</h1>
+                <p>Manage your personal information and preferences</p>
+            </div>
+            <div class="header-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search..." id="searchInput">
+                </div>
+                <div class="user-profile">
+                    <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Admin">
+                    <div class="user-info">
+                        <h4>Admin User</h4>
+                        <p>Administrator</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="profile-container">
+            <!-- Profile Sidebar -->
+            <div class="profile-sidebar">
+                <div class="profile-card">
+                    <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Profile" class="profile-avatar">
+                    <h3 class="profile-name">Admin User</h3>
+                    <p class="profile-title">Administrator</p>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">1,248</div>
+                            <div class="stat-label">Tasks</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">342</div>
+                            <div class="stat-label">Rewards</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width: 100%; margin-bottom: 20px;">
+                        <i class="fas fa-pencil-alt"></i> Edit Profile
+                    </button>
+                </div>
+                
+                <ul class="profile-menu">
+                    <li><a href="#" class="active"><i class="fas fa-user"></i> Personal Info</a></li>
+                    <li><a href="#"><i class="fas fa-lock"></i> Security</a></li>
+                    <li><a href="#"><i class="fas fa-bell"></i> Notifications</a></li>
+                    <li><a href="#"><i class="fas fa-credit-card"></i> Billing</a></li>
+                    <li><a href="#"><i class="fas fa-cog"></i> Preferences</a></li>
+                    <li><a href="#"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+                </ul>
+            </div>
+            
+            <!-- Profile Main Content -->
+            <div class="profile-content">
+                <div class="profile-header">
+                    <h2><i class="fas fa-user"></i> Personal Information</h2>
+                    <p>Update your personal details and contact information</p>
+                </div>
+                
+                <form id="profileForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <input type="text" id="firstName" class="form-control" value="Admin">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" id="lastName" class="form-control" value="User">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" class="form-control" value="admin@videorewards.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" class="form-control" value="+1 (555) 123-4567">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bio">Bio</label>
+                        <textarea id="bio" class="form-control" rows="4">System administrator with full access to all platform features and settings. Responsible for user management, content moderation, and system configuration.</textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input type="text" id="location" class="form-control" value="San Francisco, CA">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="timezone">Timezone</label>
+                            <select id="timezone" class="form-control">
+                                <option>(UTC-12:00) International Date Line West</option>
+                                <option>(UTC-11:00) Midway Island, Samoa</option>
+                                <option>(UTC-10:00) Hawaii</option>
+                                <option>(UTC-09:00) Alaska</option>
+                                <option selected>(UTC-08:00) Pacific Time (US & Canada)</option>
+                                <option>(UTC-07:00) Mountain Time (US & Canada)</option>
+                                <option>(UTC-06:00) Central Time (US & Canada)</option>
+                                <option>(UTC-05:00) Eastern Time (US & Canada)</option>
+                                <option>(UTC-04:00) Atlantic Time (Canada)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="avatar">Profile Picture</label>
+                        <input type="file" id="avatar" class="form-control">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="cancelBtn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+                
+                <!-- Activity Feed -->
+                <div class="activity-feed">
+                    <div class="profile-header">
+                        <h2><i class="fas fa-history"></i> Recent Activity</h2>
+                        <p>Your recent actions on the platform</p>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4 class="activity-title">Updated system settings</h4>
+                            <p class="activity-description">Changed default currency to Reward Points</p>
+                            <p class="activity-time">2 minutes ago</p>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4 class="activity-title">Reset user password</h4>
+                            <p class="activity-description">For user johndoe@example.com</p>
+                            <p class="activity-time">1 hour ago</p>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4 class="activity-title">Approved new video</h4>
+                            <p class="activity-description">"How to earn rewards quickly" by user123</p>
+                            <p class="activity-time">3 hours ago</p>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4 class="activity-title">Banned user</h4>
+                            <p class="activity-description">spammer123 for violating community guidelines</p>
+                            <p class="activity-time">Yesterday</p>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4 class="activity-title">Created new task</h4>
+                            <p class="activity-description">"Watch 5 videos to earn 50 points"</p>
+                            <p class="activity-time">2 days ago</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Profile Dashboard Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toast notification function
+            function showToast(message, isSuccess = true) {
+                const toast = document.getElementById('toast');
+                const toastMessage = document.getElementById('toast-message');
+                
+                toastMessage.textContent = message;
+                toast.className = isSuccess ? 'toast success show' : 'toast error show';
+                
+                setTimeout(() => {
+                    toast.className = 'toast';
+                }, 3000);
+            }
+            
+            // Store initial form values
+            const initialFormValues = {
+                firstName: 'Admin',
+                lastName: 'User',
+                email: 'admin@videorewards.com',
+                phone: '+1 (555) 123-4567',
+                bio: 'System administrator with full access to all platform features and settings. Responsible for user management, content moderation, and system configuration.',
+                location: 'San Francisco, CA',
+                timezone: '(UTC-08:00) Pacific Time (US & Canada)'
+            };
+            
+            // Profile menu navigation
+            const profileMenuLinks = document.querySelectorAll('.profile-menu a');
+            profileMenuLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    profileMenuLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update header
+                    const iconClass = this.querySelector('i').className;
+                    const sectionName = this.textContent.trim();
+                    document.querySelector('.profile-header h2').innerHTML = 
+                        `<i class="${iconClass}"></i> ${sectionName}`;
+                    document.querySelector('.profile-header p').textContent = 
+                        `Manage your ${sectionName.toLowerCase()} settings`;
+                    
+                    showToast(`Switched to ${sectionName}`);
+                });
+            });
+            
+            // Form submission
+            const profileForm = document.getElementById('profileForm');
+            profileForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                showToast('Profile information has been updated successfully!');
+            });
+            
+            // Cancel button
+            const cancelBtn = document.getElementById('cancelBtn');
+            cancelBtn.addEventListener('click', function() {
+                document.getElementById('firstName').value = initialFormValues.firstName;
+                document.getElementById('lastName').value = initialFormValues.lastName;
+                document.getElementById('email').value = initialFormValues.email;
+                document.getElementById('phone').value = initialFormValues.phone;
+                document.getElementById('bio').value = initialFormValues.bio;
+                document.getElementById('location').value = initialFormValues.location;
+                document.getElementById('timezone').value = initialFormValues.timezone;
+                
+                showToast('Changes discarded', false);
+            });
+            
+            // Avatar upload preview
+            const avatarInput = document.getElementById('avatar');
+            const profileAvatar = document.querySelector('.profile-avatar');
+            
+            avatarInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        profileAvatar.src = e.target.result;
+                        showToast('Profile picture updated');
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Edit profile button
+            const editProfileBtn = document.querySelector('.profile-card .btn-primary');
+            editProfileBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector('.profile-content').scrollIntoView({
+                    behavior: 'smooth'
+                });
+                showToast('Editing profile information');
+            });
+        });
+    </script>
+</body>
+</html>

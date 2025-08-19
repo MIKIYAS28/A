@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --secondary: #357abd;
+            --dark: #1a202c;
+            --light: #f7fafc;
+            --success: #48bb78;
+            --warning: #ecc94b;
+            --danger: #e53e3e;
+            --gray: #718096;
+            --gray-light: #e2e8f0;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--dark);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            padding: 20px 0;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            padding: 0 15px;
+        }
+
+        .nav-links li {
+            list-style: none;
+            margin-bottom: 5px;
+        }
+
+        .nav-links a {
+            color: #cbd5e0;
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(74, 144, 226, 0.2);
+            color: white;
+        }
+
+        .nav-links i {
+            margin-right: 12px;
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header-title p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 10px 15px 10px 40px;
+            border-radius: 50px;
+            border: 1px solid var(--gray-light);
+            width: 250px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        /* Settings Layout */
+        .settings-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .settings-sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+
+        .settings-category {
+            margin-bottom: 5px;
+        }
+
+        .settings-category h3 {
+            font-size: 15px;
+            color: var(--gray);
+            text-transform: uppercase;
+            margin: 20px 0 10px;
+            padding-left: 10px;
+        }
+
+        .settings-link {
+            display: block;
+            padding: 12px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--dark);
+            transition: all 0.2s;
+            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+        }
+
+        .settings-link i {
+            margin-right: 10px;
+            width: 24px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .settings-link:hover, .settings-link.active {
+            background: rgba(74, 144, 226, 0.1);
+            color: var(--primary);
+        }
+
+        .settings-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .settings-header {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .settings-header h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .settings-header p {
+            color: var(--gray);
+            font-size: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--gray-light);
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .form-check input {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            border: none;
+            font-size: 15px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--gray-light);
+            color: var(--gray);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-light);
+        }
+
+        /* Security Section */
+        .security-devices {
+            margin-top: 25px;
+        }
+
+        .device-card {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .device-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(74, 144, 226, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .device-info {
+            flex: 1;
+        }
+
+        .device-info h4 {
+            margin-bottom: 3px;
+        }
+
+        .device-info p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .device-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* API Keys Section */
+        .api-keys-container {
+            margin-top: 25px;
+        }
+
+        .api-key-card {
+            background: #f8fafc;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .api-key-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .api-key-value {
+            background: white;
+            border: 1px dashed var(--gray-light);
+            border-radius: 6px;
+            padding: 10px 15px;
+            font-family: monospace;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-btn {
+            background: var(--gray-light);
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--gray);
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .logo h1 span, .nav-links a span {
+                display: none;
+            }
+            
+            .logo h1 {
+                justify-content: center;
+            }
+            
+            .nav-links a {
+                justify-content: center;
+                padding: 12px;
+            }
+            
+            .nav-links i {
+                margin-right: 0;
+                font-size: 20px;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+
+            .settings-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .search-box input {
+                width: 100%;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <h1><i class="fas fa-shield-alt"></i> <span>Admin Panel</span></h1>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+            <li><a href="add video.html"><i class="fas fa-video"></i> <span>Videos</span></a></li>
+            <li><a href="users.html"><i class="fas fa-users"></i> <span>Users</span></a></li>
+            <li><a href="new-users.html"><i class="fas fa-user-plus"></i> <span>New Users</span></a></li>
+            <li><a href="analytics.html"><i class="fas fa-chart-line"></i> <span>Analytics</span></a></li>
+            <li><a href="redemptions.html"><i class="fas fa-gift"></i> <span>Redemptions</span></a></li>
+            <li><a href="tasks.html"><i class="fas fa-tasks"></i> <span>Tasks</span></a></li>
+            <li><a href="rewards.html"><i class="fas fa-coins"></i> <span>Rewards</span></a></li>
+            <li><a href="setting.html" class="active"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+            <li><a href="security.html"><i class="fas fa-lock"></i> <span>Security</span></a></li>
+            <li><a href="alerts.html"><i class="fas fa-exclamation-triangle"></i> <span>Alerts</span></a></li>
+            <li><a href="database.html"><i class="fas fa-database"></i> <span>Database</span></a></li>
+            <li><a href="integration.html"><i class="fas fa-plug"></i> <span>Integrations</span></a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">
+                <h1>System Settings</h1>
+                <p>Configure platform preferences and security</p>
+            </div>
+            <div class="header-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search settings...">
+                </div>
+                <div class="user-profile">
+                    <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Admin">
+                    <div class="user-info">
+                        <h4>Admin User</h4>
+                        <p>Administrator</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Content -->
+        <div class="settings-container">
+            <!-- Settings Sidebar -->
+            <div class="settings-sidebar">
+                <div class="settings-category">
+                    <h3>General</h3>
+                    <a href="Site Settings.html" class="settings-link active"><i class="fas fa-globe"></i> Site Settings</a>
+                    <a href="Notification .html" class="settings-link"><i class="fas fa-bell"></i> Notifications</a>
+                    <a href="Language .html" class="settings-link"><i class="fas fa-language"></i> Language</a>
+                </div>
+                
+                <div class="settings-category">
+                    <h3>Account</h3>
+                    <a href="My Profile.html" class="settings-link"><i class="fas fa-user"></i> Profile</a>
+                    <a href="Security .html" class="settings-link"><i class="fas fa-lock"></i> Security</a>
+                    <a href="Billing Dashboard.html" class="settings-link"><i class="fas fa-credit-card"></i> Billing</a>
+                </div>
+                
+                <div class="settings-category">
+                    <h3>System</h3>
+                    <a href="API Settings.html" class="settings-link"><i class="fas fa-server"></i> API Settings</a>
+                    <a href="Integration.html" class="settings-link"><i class="fas fa-plug"></i> Integrations</a>
+                    <a href="Database.html" class="settings-link"><i class="fas fa-database"></i> Database</a>
+                </div>
+                
+                <div class="settings-category">
+                    <h3>Advanced</h3>
+                    <a href="#" class="settings-link"><i class="fas fa-code"></i> Developer</a>
+                    <a href="#" class="settings-link"><i class="fas fa-bug"></i> Logs</a>
+                    <a href="#" class="settings-link"><i class="fas fa-tools"></i> Maintenance</a>
+                </div>
+            </div>
+            
+            <!-- Settings Content -->
+            <div class="settings-content">
+                <div class="settings-header">
+                    <h2><i class="fas fa-globe"></i> Site Settings</h2>
+                    <p>Configure global platform preferences and appearance</p>
+                </div>
+                
+                <form>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="siteName">Site Name</label>
+                            <input type="text" id="siteName" class="form-control" value="VideoRewards Platform">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="siteUrl">Site URL</label>
+                            <input type="text" id="siteUrl" class="form-control" value="https://videorewards.example.com">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="timezone">Timezone</label>
+                            <select id="timezone" class="form-control">
+                                <option>(UTC-12:00) International Date Line West</option>
+                                <option>(UTC-11:00) Midway Island, Samoa</option>
+                                <option>(UTC-10:00) Hawaii</option>
+                                <option>(UTC-09:00) Alaska</option>
+                                <option selected>(UTC-08:00) Pacific Time (US & Canada)</option>
+                                <option>(UTC-07:00) Mountain Time (US & Canada)</option>
+                                <option>(UTC-06:00) Central Time (US & Canada)</option>
+                                <option>(UTC-05:00) Eastern Time (US & Canada)</option>
+                                <option>(UTC-04:00) Atlantic Time (Canada)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dateFormat">Date Format</label>
+                            <select id="dateFormat" class="form-control">
+                                <option>MM/DD/YYYY</option>
+                                <option selected>DD/MM/YYYY</option>
+                                <option>YYYY-MM-DD</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="defaultLanguage">Default Language</label>
+                            <select id="defaultLanguage" class="form-control">
+                                <option>English</option>
+                                <option>Spanish</option>
+                                <option>French</option>
+                                <option>German</option>
+                                <option>Chinese</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="currency">Default Currency</label>
+                            <select id="currency" class="form-control">
+                                <option>USD ($)</option>
+                                <option>EUR (€)</option>
+                                <option>GBP (£)</option>
+                                <option>JPY (¥)</option>
+                                <option selected>Reward Points</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Platform Features</label>
+                        <div class="form-check">
+                            <input type="checkbox" id="registration" checked>
+                            <label for="registration">Enable new user registration</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="comments" checked>
+                            <label for="comments">Enable user comments</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="notifications">
+                            <label for="notifications">Enable email notifications</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="analytics" checked>
+                            <label for="analytics">Enable usage analytics</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="logoUpload">Site Logo</label>
+                        <input type="file" id="logoUpload" class="form-control">
+                        <small class="text-muted">Recommended size: 200x50 pixels</small>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+                
+                <!-- Security Section -->
+                <div class="security-devices">
+                    <div class="settings-header">
+                        <h2><i class="fas fa-lock"></i> Security Settings</h2>
+                        <p>Manage your account security and connected devices</p>
+                    </div>
+                    
+                    <div class="device-card">
+                        <div class="device-icon">
+                            <i class="fas fa-laptop"></i>
+                        </div>
+                        <div class="device-info">
+                            <h4>MacBook Pro (15-inch, 2023)</h4>
+                            <p>San Francisco, CA • Active now</p>
+                        </div>
+                        <div class="device-actions">
+                            <button class="btn btn-outline">Logout</button>
+                        </div>
+                    </div>
+                    
+                    <div class="device-card">
+                        <div class="device-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="device-info">
+                            <h4>iPhone 14 Pro</h4>
+                            <p>Los Angeles, CA • Last active 2 hours ago</p>
+                        </div>
+                        <div class="device-actions">
+                            <button class="btn btn-outline">Logout</button>
+                        </div>
+                    </div>
+                    
+                    <div class="device-card">
+                        <div class="device-icon">
+                            <i class="fas fa-tablet-alt"></i>
+                        </div>
+                        <div class="device-info">
+                            <h4>iPad Pro (12.9-inch)</h4>
+                            <p>New York, NY • Last active 3 days ago</p>
+                        </div>
+                        <div class="device-actions">
+                            <button class="btn btn-outline">Logout</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- API Keys Section -->
+                <div class="api-keys-container">
+                    <div class="settings-header">
+                        <h2><i class="fas fa-key"></i> API Keys</h2>
+                        <p>Manage your application integration keys</p>
+                    </div>
+                    
+                    <div class="api-key-card">
+                        <div class="api-key-header">
+                            <h4>Production API Key</h4>
+                            <span class="status status-active">Active</span>
+                        </div>
+                        <div class="api-key-value">
+                            <span>sk_live_51Nc...Wv2i</span>
+                            <button class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-outline">Regenerate</button>
+                            <button class="btn btn-outline">Disable</button>
+                        </div>
+                    </div>
+                    
+                    <div class="api-key-card">
+                        <div class="api-key-header">
+                            <h4>Test API Key</h4>
+                            <span class="status status-inactive">Inactive</span>
+                        </div>
+                        <div class="api-key-value">
+                            <span>sk_test_51Nc...9JfK</span>
+                            <button class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-outline">Regenerate</button>
+                            <button class="btn btn-primary">Enable</button>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-outline"><i class="fas fa-plus"></i> Create New API Key</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Settings Dashboard Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Settings sidebar navigation
+            const settingsLinks = document.querySelectorAll('.settings-link');
+            settingsLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // REMOVE or COMMENT OUT the next line to allow navigation:
+                    // e.preventDefault();
+
+                    // Optionally, you can keep the active class logic for styling
+                    settingsLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Copy API key functionality
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const apiKey = this.parentElement.querySelector('span').textContent;
+                    navigator.clipboard.writeText(apiKey);
+
+                    // Show copied feedback
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                    }, 2000);
+                });
+            });
+
+            // Form submission
+            const settingsForm = document.querySelector('form');
+            settingsForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Settings have been saved successfully!');
+            });
+        });
+    </script>
+</body>
+</html>
