@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Security</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --secondary: #357abd;
+            --dark: #1a202c;
+            --light: #f7fafc;
+            --success: #48bb78;
+            --warning: #ecc94b;
+            --danger: #e53e3e;
+            --gray: #718096;
+            --gray-light: #e2e8f0;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --security-bg: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--dark);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            padding: 20px 0;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            padding: 0 15px;
+        }
+
+        .nav-links li {
+            list-style: none;
+            margin-bottom: 5px;
+        }
+
+        .nav-links a {
+            color: #cbd5e0;
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(74, 144, 226, 0.2);
+            color: white;
+        }
+
+        .nav-links i {
+            margin-right: 12px;
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header-title p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 10px 15px 10px 40px;
+            border-radius: 50px;
+            border: 1px solid var(--gray-light);
+            width: 250px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .card-header i {
+            font-size: 24px;
+            color: var(--gray);
+        }
+
+        /* Security Stats */
+        .security-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: var(--security-bg);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card.critical {
+            border-left-color: var(--danger);
+        }
+
+        .stat-card.warning {
+            border-left-color: var(--warning);
+        }
+
+        .stat-card.success {
+            border-left-color: var(--success);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        /* Threat Level */
+        .threat-level {
+            background: var(--security-bg);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .threat-level-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .threat-level-title {
+            font-weight: 600;
+        }
+
+        .threat-level-value {
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .threat-level-value.critical {
+            color: var(--danger);
+        }
+
+        .threat-level-value.warning {
+            color: var(--warning);
+        }
+
+        .threat-meter {
+            height: 10px;
+            background: var(--gray-light);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .threat-meter-fill {
+            height: 100%;
+            background: var(--success);
+            width: 30%;
+        }
+
+        .threat-meter-fill.warning {
+            background: var(--warning);
+            width: 60%;
+        }
+
+        .threat-meter-fill.critical {
+            background: var(--danger);
+            width: 90%;
+        }
+
+        /* Activity Log */
+        .activity-log {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            padding: 15px 0;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            gap: 15px;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(74, 144, 226, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .activity-icon i {
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .activity-icon.security {
+            background: rgba(229, 62, 62, 0.1);
+        }
+
+        .activity-icon.security i {
+            color: var(--danger);
+        }
+
+        .activity-icon.warning {
+            background: rgba(236, 201, 75, 0.1);
+        }
+
+        .activity-icon.warning i {
+            color: var(--warning);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .activity-desc {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* Security Actions */
+        .security-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-card {
+            background: white;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(74, 144, 226, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+        }
+
+        .action-icon i {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .action-card.security .action-icon {
+            background: rgba(229, 62, 62, 0.1);
+        }
+
+        .action-card.security .action-icon i {
+            color: var(--danger);
+        }
+
+        .action-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .action-desc {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .logo h1 span, .nav-links a span {
+                display: none;
+            }
+            
+            .logo h1 {
+                justify-content: center;
+            }
+            
+            .nav-links a {
+                justify-content: center;
+                padding: 12px;
+            }
+            
+            .nav-links i {
+                margin-right: 0;
+                font-size: 20px;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .search-box input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <h1><i class="fas fa-shield-alt"></i> <span>Admin Panel</span></h1>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+            <li><a href="add video.html"><i class="fas fa-video"></i> <span>Videos</span></a></li>
+            <li><a href="users.html"><i class="fas fa-users"></i> <span>Users</span></a></li>
+            <li><a href="new-users.html"><i class="fas fa-user-plus"></i> <span>New Users</span></a></li>
+            <li><a href="analytics.html"><i class="fas fa-chart-line"></i> <span>Analytics</span></a></li>
+            <li><a href="redemptions.html"><i class="fas fa-gift"></i> <span>Redemptions</span></a></li>
+            <li><a href="tasks.html"><i class="fas fa-tasks"></i> <span>Tasks</span></a></li>
+            <li><a href="rewards.html"><i class="fas fa-coins"></i> <span>Rewards</span></a></li>
+            <li><a href="setting.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+            <li><a href="security.html" class="active"><i class="fas fa-lock"></i> <span>Security</span></a></li>
+            <li><a href="alerts.html"><i class="fas fa-exclamation-triangle"></i> <span>Alerts</span></a></li>
+            <li><a href="database.html"><i class="fas fa-database"></i> <span>Database</span></a></li>
+            <li><a href="integration.html"><i class="fas fa-plug"></i> <span>Integrations</span></a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">
+                <h1>Security Dashboard</h1>
+                <p>Monitor security status and manage protections</p>
+            </div>
+            <div class="header-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search security events...">
+                </div>
+                <div class="user-profile">
+                    <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Admin">
+                    <div class="user-info">
+                        <h4>Admin User</h4>
+                        <p>Security Administrator</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Stats -->
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3>Security Overview</h3>
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                
+                <div class="security-stats">
+                    <div class="stat-card">
+                        <div class="stat-value">98%</div>
+                        <div class="stat-label">Security Score</div>
+                    </div>
+                    <div class="stat-card critical">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Critical Threats</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-value">24</div>
+                        <div class="stat-label">Warnings</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-value">97</div>
+                        <div class="stat-label">Protected Items</div>
+                    </div>
+                </div>
+                
+                <div class="threat-level">
+                    <div class="threat-level-header">
+                        <div class="threat-level-title">Current Threat Level</div>
+                        <div class="threat-level-value">Low</div>
+                    </div>
+                    <div class="threat-meter">
+                        <div class="threat-meter-fill"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3>Recent Security Events</h3>
+                    <i class="fas fa-history"></i>
+                </div>
+                
+                <div class="activity-log">
+                    <div class="activity-item">
+                        <div class="activity-icon security">
+                            <i class="fas fa-skull"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Critical Threat Detected</div>
+                            <div class="activity-desc">Malicious login attempt from suspicious IP blocked</div>
+                            <div class="activity-time">2 minutes ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Firewall Updated</div>
+                            <div class="activity-desc">New firewall rules applied successfully</div>
+                            <div class="activity-time">15 minutes ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Unusual Activity</div>
+                            <div class="activity-desc">Multiple failed login attempts detected</div>
+                            <div class="activity-time">1 hour ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Security Scan Completed</div>
+                            <div class="activity-desc">Full system scan found 3 vulnerabilities</div>
+                            <div class="activity-time">3 hours ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Admin Permissions Updated</div>
+                            <div class="activity-desc">User permissions modified by admin</div>
+                            <div class="activity-time">Yesterday, 4:32 PM</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Security Actions -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3>Security Actions</h3>
+                <i class="fas fa-tools"></i>
+            </div>
+            
+            <div class="security-actions">
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h4 class="action-title">Run Security Scan</h4>
+                    <p class="action-desc">Perform a full system security scan</p>
+                    <button class="btn btn-outline">Start Scan</button>
+                </div>
+                
+                <div class="action-card security">
+                    <div class="action-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <h4 class="action-title">Update Firewall</h4>
+                    <p class="action-desc">Apply latest firewall rules</p>
+                    <button class="btn btn-outline">Update Now</button>
+                </div>
+                
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-user-lock"></i>
+                    </div>
+                    <h4 class="action-title">Manage Users</h4>
+                    <p class="action-desc">Review admin permissions</p>
+                    <button class="btn btn-outline">Access Panel</button>
+                </div>
+                
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-file-shield"></i>
+                    </div>
+                    <h4 class="action-title">Backup Data</h4>
+                    <p class="action-desc">Create a new system backup</p>
+                    <button class="btn btn-outline">Backup Now</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Threat Monitoring -->
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3>Threat Monitoring</h3>
+                    <i class="fas fa-radar"></i>
+                </div>
+                
+                <div class="threat-level" style="margin-top: 0;">
+                    <div class="threat-level-header">
+                        <div class="threat-level-title">Active Threats</div>
+                        <div class="threat-level-value critical">High</div>
+                    </div>
+                    <div class="threat-meter">
+                        <div class="threat-meter-fill critical"></div>
+                    </div>
+                </div>
+                
+                <div class="activity-log" style="max-height: 250px;">
+                    <div class="activity-item">
+                        <div class="activity-icon security">
+                            <i class="fas fa-bug"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Malware Detected</div>
+                            <div class="activity-desc">File "update.exe" identified as Trojan:Win32/Zpevdo.B</div>
+                            <div class="activity-time">Just now</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon security">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">DDoS Attack</div>
+                            <div class="activity-desc">Incoming traffic spike from multiple sources</div>
+                            <div class="activity-time">5 minutes ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon warning">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Vulnerability Found</div>
+                            <div class="activity-desc">Outdated library in payment module</div>
+                            <div class="activity-time">20 minutes ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-shield-virus"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Threat Neutralized</div>
+                            <div class="activity-desc">Malicious process terminated successfully</div>
+                            <div class="activity-time">45 minutes ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3>Security Status</h3>
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                
+                <div class="security-stats">
+                    <div class="stat-card success">
+                        <div class="stat-value">ON</div>
+                        <div class="stat-label">Firewall</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-value">ON</div>
+                        <div class="stat-label">Antivirus</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-value">OFF</div>
+                        <div class="stat-label">Encryption</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-value">ON</div>
+                        <div class="stat-label">2FA</div>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Security Recommendations</label>
+                    <div class="form-check">
+                        <input type="checkbox" id="encryption" checked>
+                        <label for="encryption">Enable full-disk encryption</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="backup" checked>
+                        <label for="backup">Schedule daily backups</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="audit">
+                        <label for="audit">Perform security audit</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="training">
+                        <label for="training">Schedule security training</label>
+                    </div>
+                </div>
+                
+                <div class="form-actions" style="border-top: none; margin-top: 20px;">
+                    <button type="button" class="btn btn-primary">Apply Recommendations</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate threat level changes
+            setInterval(() => {
+                const threatLevel = document.querySelector('.threat-level-value');
+                const threatMeter = document.querySelector('.threat-meter-fill');
+                
+                if (threatLevel.classList.contains('critical')) {
+                    threatLevel.textContent = "Low";
+                    threatLevel.className = "threat-level-value";
+                    threatMeter.className = "threat-meter-fill";
+                    threatMeter.style.width = "30%";
+                } else if (Math.random() > 0.7) {
+                    threatLevel.textContent = "Critical";
+                    threatLevel.className = "threat-level-value critical";
+                    threatMeter.className = "threat-meter-fill critical";
+                    threatMeter.style.width = "90%";
+                } else if (Math.random() > 0.5) {
+                    threatLevel.textContent = "Warning";
+                    threatLevel.className = "threat-level-value warning";
+                    threatMeter.className = "threat-meter-fill warning";
+                    threatMeter.style.width = "60%";
+                }
+            }, 10000);
+            
+            // Action card interactions
+            const actionCards = document.querySelectorAll('.action-card');
+            actionCards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (!e.target.classList.contains('btn')) {
+                        const title = this.querySelector('.action-title').textContent;
+                        alert(`Initiating action: ${title}`);
+                    }
+                });
+            });
+            
+            // Simulate security scan
+            const scanBtn = document.querySelector('.action-card:first-child .btn');
+            scanBtn.addEventListener('click', function() {
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning...';
+                this.disabled = true;
+                
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-check"></i> Completed';
+                    setTimeout(() => {
+                        this.innerHTML = 'Start Scan';
+                        this.disabled = false;
+                    }, 2000);
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>
